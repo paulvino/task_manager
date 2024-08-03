@@ -8,6 +8,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:latest
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: testdb
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -20,6 +35,11 @@ jobs:
           gradle-version: 8.9
       - run: make lint
       - run: make test
+        env:
+          SPRING_PROFILES_ACTIVE: ci
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
+          SPRING_DATASOURCE_USERNAME: testuser
+          SPRING_DATASOURCE_PASSWORD: testpassword
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v8.0.0
         env:

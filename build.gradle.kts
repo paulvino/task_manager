@@ -56,7 +56,6 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
-//    runtimeOnly("com.h2database:h2:2.2.224")
     runtimeOnly("org.postgresql:postgresql")
 
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
