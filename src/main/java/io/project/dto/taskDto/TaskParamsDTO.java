@@ -11,5 +11,7 @@ public class TaskParamsDTO {
 
     private Long assigneeId;
 
+    private Long authorId;
+
     private String status;
 }

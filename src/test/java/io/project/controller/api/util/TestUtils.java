@@ -1,5 +1,6 @@
 package io.project.controller.api.util;
 
+import io.project.controller.api.AuthenticationController;
 import io.project.model.Task;
 import io.project.model.TaskStatus;
 import io.project.model.User;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+
 @Getter
 @Component
 public class TestUtils {
@@ -35,6 +38,8 @@ public class TestUtils {
     private TaskStatusRepository taskStatusRepository;
     @Autowired
     private TaskRepository taskRepository;
+    @Autowired
+    private AuthenticationController authenticationController;
 
     @PostConstruct
     private void init() {
@@ -59,10 +64,10 @@ public class TestUtils {
                 .ignore(Select.field(Task::getId))
                 .ignore(Select.field(Task::getCreatedAt))
                 .ignore(Select.field(Task::getAssignee))
+                .ignore(Select.field(Task::getAuthor))
                 .ignore(Select.field(Task::getTaskStatus))
                 .supply(Select.field(Task::getName), () -> faker.lorem().word() + faker.lorem().sentence())
                 .supply(Select.field(Task::getDescription), () -> faker.lorem().sentence())
-                .supply(Select.field(Task::getIndex), () -> faker.number().randomNumber())
                 .toModel();
     }
 
@@ -81,8 +86,11 @@ public class TestUtils {
         var testUser = Instancio.of(getUserModel())
                 .create();
 
+        jwt().jwt(builder -> builder.subject(testUser.getEmail()));
+
         userRepository.save(testUser);
         testTask.setAssignee(testUser);
+        testTask.setAuthor(testUser);
 
         var testTaskStatus = Instancio.of(getTaskStatusModel())
                 .create();

@@ -38,8 +38,6 @@ public class Task implements BaseEntity {
     @Column(unique = true)
     private String name;
 
-    private Long index;
-
     private String description;
 
     @CreatedDate
@@ -51,4 +49,7 @@ public class Task implements BaseEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     private User assignee;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private User author;
 }

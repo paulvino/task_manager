@@ -25,9 +25,7 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 public class SecurityConfig {
 
     private final JwtDecoder jwtDecoder;
-
     private final PasswordEncoder passwordEncoder;
-
     private final CustomUserDetailsService userService;
 
     @Bean

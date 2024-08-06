@@ -31,8 +31,6 @@ import io.project.model.Task;
 import io.project.util.UserUtils;
 import io.project.repository.TaskRepository;
 import io.project.controller.api.util.TestUtils;
-import io.project.model.TaskStatus;
-import io.project.repository.TaskStatusRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -48,9 +46,6 @@ public class TaskControllerTest {
     private TaskRepository taskRepository;
 
     @Autowired
-    private TaskStatusRepository taskStatusRepository;
-
-    @Autowired
     private TestUtils testUtils;
 
     @Autowired
@@ -61,8 +56,6 @@ public class TaskControllerTest {
     private Task testTask;
 
     private Task testTaskCreate;
-
-    private TaskStatus testTaskStatus;
 
     @BeforeEach
     public void setUp() {
@@ -99,6 +92,7 @@ public class TaskControllerTest {
     public void testIndexWithFilter() throws Exception {
         var titleCont = testTask.getName().substring(1).toLowerCase();
         var assigneeId = testTask.getAssignee().getId();
+        var authorId = testTask.getAuthor().getId();
         var status = testTask.getTaskStatus().getSlug();
 
         var wrongTask = testUtils.getTestTask();
@@ -108,6 +102,7 @@ public class TaskControllerTest {
                 + "?"
                 + "name=" + titleCont
                 + "&assigneeId=" + assigneeId
+                + "&authorId=" + authorId
                 + "&status=" + status)
                 .with(token);
 
@@ -117,10 +112,10 @@ public class TaskControllerTest {
 
         var data = new HashMap<>();
         data.put("assignee_id", testTask.getAssignee().getId());
+        data.put("author_id", testTask.getAuthor().getId());
         data.put("content", testTask.getDescription());
         data.put("createdAt", testTask.getCreatedAt().format(TestUtils.FORMATTER));
         data.put("id", testTask.getId());
-        data.put("index", testTask.getIndex());
         data.put("status", testTask.getTaskStatus().getSlug());
         data.put("title", testTask.getName());
 
@@ -145,8 +140,8 @@ public class TaskControllerTest {
                 jsonAssert -> jsonAssert.node("id").isEqualTo(testTask.getId()),
                 jsonAssert -> jsonAssert.node("title").isEqualTo(testTask.getName()),
                 jsonAssert -> jsonAssert.node("content").isEqualTo(testTask.getDescription()),
-                jsonAssert -> jsonAssert.node("index").isEqualTo(testTask.getIndex()),
                 jsonAssert -> jsonAssert.node("assignee_id").isEqualTo(testTask.getAssignee().getId()),
+                jsonAssert -> jsonAssert.node("author_id").isEqualTo(testTask.getAuthor().getId()),
                 jsonAssert -> jsonAssert.node("status").isEqualTo(testTask.getTaskStatus().getSlug()),
                 jsonAssert -> jsonAssert.node("createdAt")
                         .isEqualTo(testTask.getCreatedAt().format(TestUtils.FORMATTER))
@@ -160,10 +155,12 @@ public class TaskControllerTest {
     public void testCreate() throws Exception {
         var data = new HashMap<>();
         data.put("title", testTaskCreate.getName());
-        data.put("index", testTaskCreate.getIndex());
         data.put("content", testTaskCreate.getDescription());
         data.put("status", testTaskCreate.getTaskStatus().getSlug());
         data.put("assignee_id", testTaskCreate.getAssignee().getId());
+        data.put("author", testTaskCreate.getAuthor().getEmail());
+
+        var token = jwt().jwt(builder -> builder.subject(testTaskCreate.getAuthor().getEmail()));
 
         var tasksCount = taskRepository.count();
 
@@ -184,8 +181,8 @@ public class TaskControllerTest {
 
         assertThat(task.getName()).isEqualTo(testTaskCreate.getName());
         assertThat(task.getDescription()).isEqualTo(testTaskCreate.getDescription());
-        assertThat(task.getIndex()).isEqualTo(testTaskCreate.getIndex());
         assertThat(task.getAssignee()).isEqualTo(testTaskCreate.getAssignee());
+        assertThat(task.getAuthor()).isEqualTo(testTaskCreate.getAuthor());
         assertThat(task.getTaskStatus()).isEqualTo(testTaskCreate.getTaskStatus());
     }
 
@@ -214,7 +211,6 @@ public class TaskControllerTest {
         var task = taskRepository.findByName(testTask.getName()).get();
 
         assertThat(task.getDescription()).isEqualTo(newDescription);
-        assertThat(task.getIndex()).isEqualTo(testTask.getIndex());
         assertThat(task.getTaskStatus()).isEqualTo(testTask.getTaskStatus());
         assertThat(task.getName()).isEqualTo(testTask.getName());
         assertThat(task.getAssignee()).isEqualTo(testTask.getAssignee());

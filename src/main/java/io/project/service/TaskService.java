@@ -6,9 +6,11 @@ import io.project.dto.taskDto.TaskParamsDTO;
 import io.project.dto.taskDto.TaskUpdateDTO;
 import io.project.exception.ResourceNotFoundException;
 import io.project.mapper.TaskMapper;
+import io.project.mapper.UserMapper;
 import io.project.repository.TaskRepository;
 import io.project.util.TaskUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,11 +19,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TaskService {
 
+    @Autowired
     private final TaskRepository taskRepository;
 
+    @Autowired
     private final TaskMapper taskMapper;
 
+    @Autowired
+    private final UserMapper userMapper;
+
+    @Autowired
     private final TaskUtils builder;
+
+    @Autowired
+    private final UserService userService;
 
     public List<TaskDTO> getAll(TaskParamsDTO params) {
         var specification = builder.build(params);
@@ -39,8 +50,12 @@ public class TaskService {
 
     public TaskDTO create(TaskCreateDTO taskData) {
         var task = taskMapper.map(taskData);
-        taskRepository.save(task);
 
+        var currentUser = userService.getCurrentUser();
+
+        task.setAuthor(currentUser);
+
+        taskRepository.save(task);
         return taskMapper.map(task);
     }
 

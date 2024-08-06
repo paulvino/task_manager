@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
 
     private final JWTUtils jwtUtils;
-
     private final AuthenticationManager authenticationManager;
 
     @PostMapping(path = "/login")
