@@ -24,6 +24,9 @@ public class TaskDTO {
     @JsonProperty("author_id")
     private Long authorId;
 
+    @JsonProperty("priority_id")
+    private Long priorityId;
+
     private String title;
 
     private String content;

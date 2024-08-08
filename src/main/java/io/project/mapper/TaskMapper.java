@@ -5,8 +5,10 @@ import io.project.dto.taskDto.TaskDTO;
 import io.project.dto.taskDto.TaskUpdateDTO;
 
 import io.project.exception.ResourceNotFoundException;
+import io.project.model.Priority;
 import io.project.model.Task;
 import io.project.model.TaskStatus;
+import io.project.repository.PriorityRepository;
 import io.project.repository.TaskStatusRepository;
 
 import org.mapstruct.Mapper;
@@ -27,11 +29,14 @@ public abstract class TaskMapper {
 
     @Autowired
     private TaskStatusRepository taskStatusRepository;
+    @Autowired
+    private PriorityRepository priorityRepository;
 
     @Mapping(source = "assigneeId", target = "assignee")
     @Mapping(source = "status", target = "taskStatus")
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
+    @Mapping(source = "priorityId", target = "priority")
     public abstract Task map(TaskCreateDTO dto);
 
     @Mapping(source = "assignee.id", target = "assigneeId")
@@ -39,6 +44,7 @@ public abstract class TaskMapper {
     @Mapping(source = "taskStatus.slug", target = "status")
     @Mapping(source = "name", target = "title")
     @Mapping(source = "description", target = "content")
+    @Mapping(source = "priority.id", target = "priorityId")
     public abstract TaskDTO map(Task model);
 
     @Mapping(source = "assigneeId", target = "assignee")
@@ -46,10 +52,20 @@ public abstract class TaskMapper {
     @Mapping(source = "status", target = "taskStatus")
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
+    @Mapping(source = "priorityId", target = "priority")
     public abstract void update(TaskUpdateDTO dto, @MappingTarget Task destination);
 
     public TaskStatus toEntity(String slug) {
         return taskStatusRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Status not found"));
+    }
+
+    protected Long map(Priority priority) {
+        return priority == null ? null : priority.getId();
+    }
+
+    protected Priority map(Long id) {
+        return id == null ? null : priorityRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Priority not found"));
     }
 }

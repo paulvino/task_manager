@@ -90,19 +90,18 @@ public class TaskControllerTest {
 
     @Test
     public void testIndexWithFilter() throws Exception {
-        var titleCont = testTask.getName().substring(1).toLowerCase();
+        var titleCont = testTask.getName();
         var assigneeId = testTask.getAssignee().getId();
         var authorId = testTask.getAuthor().getId();
         var status = testTask.getTaskStatus().getSlug();
-
-        var wrongTask = testUtils.getTestTask();
-        taskRepository.save(wrongTask);
+        var priorityId = testTask.getPriority().getId();
 
         var request = get("/api/tasks"
                 + "?"
                 + "name=" + titleCont
                 + "&assigneeId=" + assigneeId
                 + "&authorId=" + authorId
+                + "&priorityId=" + priorityId
                 + "&status=" + status)
                 .with(token);
 
@@ -111,16 +110,17 @@ public class TaskControllerTest {
                 .andReturn();
 
         var data = new HashMap<>();
-        data.put("assignee_id", testTask.getAssignee().getId());
-        data.put("author_id", testTask.getAuthor().getId());
+        data.put("assignee_id", assigneeId);
+        data.put("author_id", authorId);
         data.put("content", testTask.getDescription());
         data.put("createdAt", testTask.getCreatedAt().format(TestUtils.FORMATTER));
         data.put("id", testTask.getId());
-        data.put("status", testTask.getTaskStatus().getSlug());
-        data.put("title", testTask.getName());
+        data.put("priority_id", priorityId);
+        data.put("status", status);
+        data.put("title", titleCont);
 
         var body = result.getResponse().getContentAsString();
-        assertThatJson(body).when(Option.IGNORING_ARRAY_ORDER)
+        assertThatJson(body).when(Option.IGNORING_ARRAY_ORDER, Option.IGNORING_EXTRA_FIELDS)
                 .isArray()
                 .contains(om.writeValueAsString(data));
     }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.project.controller.api.util.TestUtils;
 import io.project.model.User;
+import io.project.repository.TaskRepository;
 import io.project.repository.UserRepository;
 import io.project.util.UserUtils;
 import net.datafaker.Faker;
@@ -45,6 +46,9 @@ public class UserControllerTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     @Autowired
     private TestUtils testUtils;
@@ -214,5 +218,18 @@ public class UserControllerTest {
                 .andExpect(status().isInternalServerError());
 
         assertThat(userRepository.count()).isEqualTo(usersCount);
+    }
+
+    @Test
+    public void testDestroyUserWithTask() throws Exception {
+        var taskForTest = testUtils.getTestTask();
+        taskRepository.save(taskForTest);
+
+        taskForTest.setAssignee(testUser);
+
+        mockMvc.perform(delete("/api/users/" + testUser.getId()).with(token))
+                .andExpect(status().isInternalServerError());
+
+        assertThat(userRepository.findById(testUser.getId())).isPresent();
     }
 }

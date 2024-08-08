@@ -1,9 +1,11 @@
 package io.project.controller.api.util;
 
 import io.project.controller.api.AuthenticationController;
+import io.project.model.Priority;
 import io.project.model.Task;
 import io.project.model.TaskStatus;
 import io.project.model.User;
+import io.project.repository.PriorityRepository;
 import io.project.repository.TaskRepository;
 import io.project.repository.TaskStatusRepository;
 import io.project.repository.UserRepository;
@@ -18,6 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
@@ -27,6 +30,7 @@ public class TestUtils {
     private Model<User> userModel;
     private Model<Task> taskModel;
     private Model<TaskStatus> taskStatusModel;
+    private Model<Priority> priorityModel;
 
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
@@ -39,6 +43,8 @@ public class TestUtils {
     @Autowired
     private TaskRepository taskRepository;
     @Autowired
+    private PriorityRepository priorityRepository;
+    @Autowired
     private AuthenticationController authenticationController;
 
     @PostConstruct
@@ -47,6 +53,8 @@ public class TestUtils {
                 .ignore(Select.field(User::getId))
                 .ignore(Select.field(User::getCreatedAt))
                 .ignore(Select.field(User::getUpdatedAt))
+                .ignore(Select.field(User::getAssignedTasks))
+                .ignore(Select.field(User::getCreatedTasks))
                 .supply(Select.field(User::getFirstName), () -> faker.name().firstName())
                 .supply(Select.field(User::getLastName), () -> faker.name().lastName())
                 .supply(Select.field(User::getEmail), () -> faker.internet().emailAddress())
@@ -69,6 +77,13 @@ public class TestUtils {
                 .supply(Select.field(Task::getName), () -> faker.lorem().word() + faker.lorem().sentence())
                 .supply(Select.field(Task::getDescription), () -> faker.lorem().sentence())
                 .toModel();
+
+        priorityModel = Instancio.of(Priority.class)
+                .ignore(Select.field(Priority::getId))
+                .ignore(Select.field(Priority::getCreatedAt))
+                .supply(Select.field(Priority::getName), () -> faker.lorem().word() + faker.lorem().sentence())
+                .supply(Select.field(Priority::getTasks), () -> new ArrayList<Task>())
+                .toModel();
     }
 
     @Bean
@@ -76,6 +91,7 @@ public class TestUtils {
         taskRepository.deleteAll();
         userRepository.deleteAll();
         taskStatusRepository.deleteAll();
+        priorityRepository.deleteAll();
     }
 
     @Bean
@@ -97,6 +113,12 @@ public class TestUtils {
 
         taskStatusRepository.save(testTaskStatus);
         testTask.setTaskStatus(testTaskStatus);
+
+        var testPriority = Instancio.of(getPriorityModel())
+                .create();
+        priorityRepository.save(testPriority);
+        testTask.setPriority(testPriority);
+        testPriority.getTasks().add(testTask);
 
         return testTask;
     }

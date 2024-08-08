@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+
 @Getter
 @Setter
 public class TaskCreateDTO {
@@ -21,6 +22,9 @@ public class TaskCreateDTO {
 
     @JsonProperty("assignee_id")
     private Long assigneeId;
+
+    @JsonProperty("priority_id")
+    private Long priorityId;
 
     @NotNull
     private String status;
