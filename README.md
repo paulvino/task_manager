@@ -9,4 +9,4 @@
 This little application is an API of Task management system. 
 It allows you to create, edit, delete and view tasks. 
 
-Every task have a title, description, status, priority, author and performer.  
+Every task have a title, description, status, priority, author and assignee.  

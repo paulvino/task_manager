@@ -1,5 +1,19 @@
 package io.project.controller.api.util;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+
+import jakarta.annotation.PostConstruct;
+import lombok.Getter;
+import net.datafaker.Faker;
+import org.instancio.Instancio;
+import org.instancio.Model;
+import org.instancio.Select;
+
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+
 import io.project.controller.api.AuthenticationController;
 import io.project.model.Priority;
 import io.project.model.Task;
@@ -9,18 +23,6 @@ import io.project.repository.PriorityRepository;
 import io.project.repository.TaskRepository;
 import io.project.repository.TaskStatusRepository;
 import io.project.repository.UserRepository;
-import jakarta.annotation.PostConstruct;
-import lombok.Getter;
-import net.datafaker.Faker;
-import org.instancio.Instancio;
-import org.instancio.Model;
-import org.instancio.Select;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
-
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 

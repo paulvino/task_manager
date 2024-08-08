@@ -34,7 +34,9 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/login").permitAll()
                         .requestMatchers("/api/login").permitAll()
+                        .requestMatchers("/api/register").permitAll()
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/api/welcome").permitAll()
                         .requestMatchers("/index.html").permitAll()
@@ -43,6 +45,9 @@ public class SecurityConfig {
                         .requestMatchers("/v3/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .permitAll())
                 .oauth2ResourceServer((rs) -> rs.jwt((jwt) -> jwt.decoder(jwtDecoder)))
                 .httpBasic(Customizer.withDefaults())
                 .build();
