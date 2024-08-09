@@ -21,6 +21,8 @@ cd task_manager
 make run
 ```
 
+#### You can see API documentation on http://localhost:8080/swagger-ui/index.html after run the project
+
 ### Another how to:
 ```bash
 make build # building project
