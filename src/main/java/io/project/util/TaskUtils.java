@@ -32,10 +32,16 @@ public class TaskUtils {
                 : criteriaBuilder.equal(root.get("taskStatus").get("slug"), slug);
     }
 
-    private Specification<Task> withLabelId(Long labelId) {
-        return (root, query, criteriaBuilder) -> labelId == null
+    private Specification<Task> withPriorityId(Long priorityId) {
+        return (root, query, criteriaBuilder) -> priorityId == null
                 ? criteriaBuilder.conjunction()
-                : criteriaBuilder.equal(root.get("labels").get("id"), labelId);
+                : criteriaBuilder.equal(root.get("priority").get("id"), priorityId);
+    }
+
+    private Specification<Task> withCommentId(Long commentId) {
+        return (root, query, criteriaBuilder) -> commentId == null
+                ? criteriaBuilder.conjunction()
+                : criteriaBuilder.equal(root.get("comments").get("id"), commentId);
     }
 }
 

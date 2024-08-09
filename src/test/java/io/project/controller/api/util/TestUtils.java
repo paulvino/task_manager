@@ -1,5 +1,17 @@
 package io.project.controller.api.util;
 
+import io.project.model.Comment;
+import io.project.model.Priority;
+import io.project.model.Task;
+import io.project.model.TaskStatus;
+import io.project.model.User;
+
+import io.project.repository.CommentRepository;
+import io.project.repository.PriorityRepository;
+import io.project.repository.TaskRepository;
+import io.project.repository.TaskStatusRepository;
+import io.project.repository.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -14,16 +26,6 @@ import org.instancio.Select;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-import io.project.controller.api.AuthenticationController;
-import io.project.model.Priority;
-import io.project.model.Task;
-import io.project.model.TaskStatus;
-import io.project.model.User;
-import io.project.repository.PriorityRepository;
-import io.project.repository.TaskRepository;
-import io.project.repository.TaskStatusRepository;
-import io.project.repository.UserRepository;
-
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
 @Getter
@@ -33,6 +35,7 @@ public class TestUtils {
     private Model<Task> taskModel;
     private Model<TaskStatus> taskStatusModel;
     private Model<Priority> priorityModel;
+    private Model<Comment> commentModel;
 
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
@@ -47,7 +50,7 @@ public class TestUtils {
     @Autowired
     private PriorityRepository priorityRepository;
     @Autowired
-    private AuthenticationController authenticationController;
+    private CommentRepository commentRepository;
 
     @PostConstruct
     private void init() {
@@ -76,6 +79,7 @@ public class TestUtils {
                 .ignore(Select.field(Task::getAssignee))
                 .ignore(Select.field(Task::getAuthor))
                 .ignore(Select.field(Task::getTaskStatus))
+                .ignore(Select.field(Task::getCommentIds))
                 .supply(Select.field(Task::getName), () -> faker.lorem().word() + faker.lorem().sentence())
                 .supply(Select.field(Task::getDescription), () -> faker.lorem().sentence())
                 .toModel();
@@ -86,6 +90,15 @@ public class TestUtils {
                 .supply(Select.field(Priority::getName), () -> faker.lorem().word() + faker.lorem().sentence())
                 .supply(Select.field(Priority::getTasks), () -> new ArrayList<Task>())
                 .toModel();
+
+        commentModel = Instancio.of(Comment.class)
+                .ignore(Select.field(Comment::getId))
+                .ignore(Select.field(Comment::getAuthor))
+                .ignore(Select.field(Comment::getCreatedAt))
+                .ignore(Select.field(Comment::getTask))
+                .supply(Select.field(Comment::getCommentText),
+                        () -> faker.lorem().sentence() + faker.lorem().sentence())
+                .toModel();
     }
 
     @Bean
@@ -94,6 +107,7 @@ public class TestUtils {
         userRepository.deleteAll();
         taskStatusRepository.deleteAll();
         priorityRepository.deleteAll();
+        commentRepository.deleteAll();
     }
 
     @Bean
@@ -112,7 +126,6 @@ public class TestUtils {
 
         var testTaskStatus = Instancio.of(getTaskStatusModel())
                 .create();
-
         taskStatusRepository.save(testTaskStatus);
         testTask.setTaskStatus(testTaskStatus);
 

@@ -67,6 +67,9 @@ public class User implements UserDetails, BaseEntity {
     @OneToMany(mappedBy = "author", cascade = CascadeType.MERGE)
     private List<Task> createdTasks;
 
+    @OneToMany(mappedBy = "commentText", cascade = CascadeType.MERGE)
+    private List<Comment> createdComments;
+
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> roles;
 

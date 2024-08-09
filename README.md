@@ -9,4 +9,22 @@
 This little application is an API of Task management system. 
 It allows you to create, edit, delete and view tasks. 
 
-Every task have a title, description, status, priority, author and assignee.  
+Every task have a title, description, status, priority, author and assignee.
+
+### How to install:
+```bash
+git clone git@github.com:paulvino/task_manager.git
+cd task_manager
+```
+### How to run:
+```bash
+make run
+```
+
+### Another how to:
+```bash
+make build # building project
+make clean # cleaning project
+make report # tests reporting
+make lint # linter checks
+```

@@ -6,7 +6,6 @@ import io.project.dto.taskDto.TaskParamsDTO;
 import io.project.dto.taskDto.TaskUpdateDTO;
 import io.project.exception.ResourceNotFoundException;
 import io.project.mapper.TaskMapper;
-import io.project.mapper.UserMapper;
 import io.project.repository.TaskRepository;
 import io.project.util.TaskUtils;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +23,6 @@ public class TaskService {
 
     @Autowired
     private final TaskMapper taskMapper;
-
-    @Autowired
-    private final UserMapper userMapper;
 
     @Autowired
     private final TaskUtils builder;
@@ -52,7 +48,6 @@ public class TaskService {
         var task = taskMapper.map(taskData);
 
         var currentUser = userService.getCurrentUser();
-
         task.setAuthor(currentUser);
 
         taskRepository.save(task);
